@@ -12,5 +12,6 @@
       "src": "/(.*)",
       "dest": "grow_demo/wsgi.py"
     }
-  ]
+  ],
+  "buildCommand": "bash build.sh"
 }
