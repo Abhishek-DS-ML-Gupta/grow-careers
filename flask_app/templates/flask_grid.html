@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ObjectTrade - Plans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        milky: {
+                            50: '#f8faff',
+                            100: '#f0f6ff',
+                            200: '#e1eeff',
+                            300: '#c6ddff',
+                            400: '#9bc6ff',
+                            500: '#6ba8ff',
+                            600: '#4b8df7',
+                            700: '#3a6fe6',
+                            800: '#3357b8',
+                            900: '#2c4893',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-milky-50 text-gray-800 min-h-screen">
+
+    <nav class="bg-white/80 backdrop-blur border-b border-milky-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-milky-600 rounded-lg flex items-center justify-center text-white font-bold">OT</div>
+                    <span class="text-xl font-bold text-milky-800 tracking-tight">ObjectTrade</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="/" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-milky-100 hover:text-milky-700 transition">Home</a>
+                    <a href="/" class="px-3 py-2 rounded-lg text-sm font-medium text-milky-700 bg-milky-100">Plans</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8">
+            <p class="font-semibold text-yellow-800">Demo Notice</p>
+            <p class="text-sm text-yellow-700">⚠️ This is a demo project for educational purposes only. No real investments, payments, or returns.</p>
+        </div>
+
+        {% for obj in objects %}
+        <div class="space-y-4 mb-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-milky-400 to-milky-600 flex items-center justify-center text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">{{ obj.name }}</h2>
+                    <p class="text-sm text-gray-500">Market Value: <span class="font-semibold text-gray-700">₹{{ obj.market_value_inr }}</span></p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {% for plan in obj.plans %}
+                <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition border border-milky-100 flex flex-col">
+                    <div class="p-5 flex-1">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-base font-bold text-gray-900">{{ plan.name }}</h3>
+                            {% if plan.is_limited %}
+                            <span class="px-2 py-1 text-xs font-bold bg-amber-50 text-amber-700 rounded-lg border border-amber-100">Limited</span>
+                            {% endif %}
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
+                                <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Price</p>
+                                <p class="text-lg font-bold text-gray-900 mt-0.5">₹{{ plan.price_inr }}</p>
+                            </div>
+                            <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
+                                <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Validity</p>
+                                <p class="text-lg font-bold text-gray-900 mt-0.5">{{ plan.validity_days }} days</p>
+                            </div>
+                            <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
+                                <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Total Income</p>
+                                <p class="text-lg font-bold text-emerald-600 mt-0.5">₹{{ plan.total_income_inr }}</p>
+                            </div>
+                            <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
+                                <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Daily Income</p>
+                                <p class="text-lg font-bold text-milky-700 mt-0.5">₹{{ plan.daily_income_inr }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-5 py-4 bg-gray-50 border-t border-milky-100 rounded-b-2xl">
+                        <a href="/coming-soon" class="block w-full text-center rounded-xl bg-milky-600 py-2.5 text-sm font-semibold text-white hover:bg-milky-700 transition shadow-sm">Invest Now</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <footer class="mt-auto py-6 border-t border-milky-200 bg-white/60">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
+            <p class="mb-2">⚠️ This is a demo project for educational purposes only.</p>
+            <p>ObjectTrade Demo</p>
+        </div>
+    </footer>
+
+</body>
+</html>

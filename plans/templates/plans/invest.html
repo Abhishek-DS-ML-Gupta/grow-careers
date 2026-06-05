@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Invest - ObjectTrade{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-milky-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-milky-500 to-milky-600 p-6 text-white">
+            <h1 class="text-2xl font-bold">{{ plan.name }}</h1>
+            <p class="text-milky-100 mt-1">{{ plan.object.name }}</p>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-milky-50 rounded-xl p-4 border border-milky-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Investment</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">₹{{ plan.price_inr|floatformat:0 }}</p>
+                </div>
+                <div class="bg-milky-50 rounded-xl p-4 border border-milky-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Validity</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ plan.validity_days }} days</p>
+                </div>
+                <div class="bg-milky-50 rounded-xl p-4 border border-milky-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Total Income</p>
+                    <p class="text-2xl font-bold text-emerald-600 mt-1">₹{{ plan.total_income_inr|floatformat:0 }}</p>
+                </div>
+                <div class="bg-milky-50 rounded-xl p-4 border border-milky-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Daily Income</p>
+                    <p class="text-2xl font-bold text-milky-700 mt-1">₹{{ plan.daily_income_inr|floatformat:0 }}</p>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                <p class="text-sm text-amber-800">
+                    <strong>Note:</strong> This is a demo. No real money will be charged. This action is for UI demonstration only.
+                </p>
+            </div>
+
+            <form method="post" class="flex gap-3">
+                {% csrf_token %}
+                <a href="{% url 'plans_grid' %}" class="flex-1 text-center rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Cancel</a>
+                <button type="submit" class="flex-1 rounded-xl bg-milky-600 py-2.5 text-sm font-semibold text-white hover:bg-milky-700 transition shadow-sm">Confirm Investment</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
