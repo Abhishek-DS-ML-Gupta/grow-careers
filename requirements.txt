@@ -11,3 +11,4 @@ sqlparse==0.5.5
 tzdata==2026.2
 asgiref==3.11.1
 typing_extensions==4.15.0
+dj-database-url
