@@ -11,10 +11,21 @@ class WalletAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'investment_amount', 'daily_return', 'duration_days', 'active', 'created_at']
+    list_display = ['name', 'investment_amount', 'daily_return', 'duration_days', 'total_income', 'active', 'created_at']
     list_filter = ['active', 'created_at']
     search_fields = ['name', 'description']
     readonly_fields = ['created_at', 'updated_at']
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'image', 'active')
+        }),
+        ('Financial Details', {
+            'fields': ('investment_amount', 'daily_return', 'duration_days', 'total_income')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
 
 
 @admin.register(Deposit)

@@ -5,7 +5,7 @@ echo "Installing dependencies..."
 pip install -r requirements.txt
 
 echo "Creating static directory..."
-mkdir -p static/css
+mkdir -p "$(dirname "$0")/static/css"
 
 echo "Running migrations..."
 python manage.py migrate --noinput

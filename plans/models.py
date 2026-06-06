@@ -39,6 +39,14 @@ class InvestmentPlan(models.Model):
     class Meta:
         ordering = ['order', 'name']
 
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        qs = InvestmentPlan.objects.filter(object=self.object)
+        if self.pk:
+            qs = qs.exclude(pk=self.pk)
+        if qs.count() >= 3:
+            raise ValidationError('A TradeObject can have at most 3 investment plans.')
+
     def __str__(self):
         return f"{self.object.name} - {self.name}"
 

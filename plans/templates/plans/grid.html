@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Investment Plans - ObjectTrade{% endblock %}
+{% block title %}Trade Objects - ObjectTrade{% endblock %}
 {% block content %}
-<div>
+<div class="section">
   <div class="section-header-left">
     <div>
       <h1 class="section-title">Trade Objects</h1>
@@ -13,68 +13,32 @@
     </div>
   </div>
 
-  {% for obj in objects %}
-  <div class="plans-section">
-    <div class="object-header">
-      <div class="stat-icon object-icon" style="margin: 0;">{% if obj.category == 'vehicle' %}🚗{% elif obj.category == 'property' %}🏠{% elif obj.category == 'electronics' %}📱{% else %}📦{% endif %}</div>
-      <div>
-        <h2 class="object-name">{{ obj.name }}</h2>
-        <p class="object-market">Market Value: <span>₹{{ obj.market_value_inr|floatformat:0 }}</span></p>
-      </div>
-    </div>
-
-    <div class="plans-grid">
-      {% for plan in obj.plans.all %}
-      <div class="plan-card">
-        {% if plan.is_limited %}
-        <div class="plan-badge">Limited</div>
+  <div class="objects-grid">
+    {% for obj in objects %}
+    <a href="{% url 'object_detail' obj.id %}" class="object-card">
+      <div class="object-card-image">
+        {% if obj.image_url %}
+        <img src="{{ obj.image_url }}" alt="{{ obj.name }}" onerror="this.src='https://placehold.co/400x300/f5f3ff/6366f1?text={{ obj.name|truncatechars:15 }}'">
+        {% else %}
+        <img class="object-placeholder-img" src="https://images.unsplash.com/{% if obj.category == 'vehicle' %}photo-1503376780353-7e6692767b70{% elif obj.category == 'property' %}photo-1545324418-cc1a3fa10c00{% elif obj.category == 'electronics' %}photo-1498049794561-7780e7231661{% else %}photo-1560472354-b33ff0c44a43{% endif %}?w=400&q=80" alt="{{ obj.name }}" onerror="this.style.display='none'">
         {% endif %}
-        <div class="plan-header">
-          <div class="plan-name">{{ plan.name }}</div>
-          <div class="plan-price">₹{{ plan.price_inr|floatformat:0 }}</div>
-          <div class="plan-validity">{{ plan.validity_days }} days validity</div>
-        </div>
-        <div class="plan-body">
-          <div class="plan-stats">
-            <div class="plan-stat">
-              <p class="plan-stat-value">₹{{ plan.price_inr|floatformat:0 }}</p>
-              <p class="plan-stat-label">Price</p>
-            </div>
-            <div class="plan-stat">
-              <p class="plan-stat-value">{{ plan.validity_days }}</p>
-              <p class="plan-stat-label">Days</p>
-            </div>
-            <div class="plan-stat highlight">
-              <p class="plan-stat-value">₹{{ plan.total_income_inr|floatformat:0 }}</p>
-              <p class="plan-stat-label">Total Income</p>
-            </div>
-            <div class="plan-stat">
-              <p class="plan-stat-value">₹{{ plan.daily_income_inr|floatformat:0 }}</p>
-              <p class="plan-stat-label">Daily Income</p>
-            </div>
-          </div>
-        </div>
-        <div class="plan-footer">
-          {% if user.is_authenticated %}
-          <a href="{% url 'invest' plan.id %}" class="plan-btn">Invest Now</a>
-          {% else %}
-          <a href="{% url 'login' %}" class="plan-btn">Login to Invest</a>
-          {% endif %}
+      </div>
+      <div class="object-card-body">
+        <h3 class="object-card-name" title="{{ obj.name }}">{{ obj.name }}</h3>
+        <p class="object-card-price">₹{{ obj.market_value_inr|floatformat:0 }}</p>
+        <div class="object-card-footer">
+          <span class="object-card-plans">{{ obj.plans.count }} Plans</span>
+          <span class="object-card-arrow">→</span>
         </div>
       </div>
-      {% empty %}
-      <div class="empty-plans">
-        No plans available for this object.
-      </div>
-      {% endfor %}
+    </a>
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📦</div>
+      <h3>No objects available</h3>
+      <p>Please check back later for new investment opportunities.</p>
     </div>
+    {% endfor %}
   </div>
-  {% empty %}
-  <div class="empty-state">
-    <div class="empty-state-icon">📦</div>
-    <h3>No objects available</h3>
-    <p>Please check back later for new investment opportunities.</p>
-  </div>
-  {% endfor %}
 </div>
 {% endblock %}

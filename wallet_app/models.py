@@ -18,12 +18,18 @@ class Wallet(models.Model):
         ordering = ['-created_at']
 
 
+def product_image_upload_to(instance, filename):
+    return f'product_images/{filename}'
+
+
 class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     investment_amount = models.DecimalField(max_digits=12, decimal_places=2)
     daily_return = models.DecimalField(max_digits=12, decimal_places=2)
     duration_days = models.PositiveIntegerField()
+    total_income = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    image = models.ImageField(upload_to=product_image_upload_to, blank=True, null=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'plans',
-    'wallet',
+    'wallet_app',
 ]
 
 MIDDLEWARE = [
@@ -88,12 +88,15 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
 RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')
 RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
 RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

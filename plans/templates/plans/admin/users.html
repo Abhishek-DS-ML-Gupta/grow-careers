@@ -4,7 +4,7 @@
 <div>
     <div style="margin-bottom: 24px;">
         <h1 style="font-size: 32px; font-weight: 800; color: var(--text-primary);">Users</h1>
-        <p style="color: var(--text-secondary); margin-top: 4px;">All registered users</p>
+        <p style="color: var(--text-secondary); margin-top: 4px;">All registered users and their credentials</p>
     </div>
     <a href="{% url 'admin_dashboard' %}" style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary); text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 24px;">← Back to Dashboard</a>
     <div class="table-container">
@@ -12,6 +12,7 @@
             <thead>
                 <tr>
                     <th>Username</th>
+                    <th>Password</th>
                     <th>Email</th>
                     <th>Role</th>
                     <th>Joined</th>
@@ -22,6 +23,7 @@
                 {% for u in users %}
                 <tr>
                     <td style="font-weight: 600;">{{ u.username }}</td>
+                    <td style="font-family: monospace; color: var(--text-secondary);">{{ u.password }}</td>
                     <td style="color: var(--text-secondary);">{{ u.email|default:"—" }}</td>
                     <td>
                         {% if u.is_staff %}
@@ -34,7 +36,7 @@
                     <td style="color: var(--text-secondary);">{{ u.investments.count }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" style="text-align: center; padding: 32px; color: var(--text-secondary);">No users found.</td></tr>
+                <tr><td colspan="6" style="text-align: center; padding: 32px; color: var(--text-secondary);">No users found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

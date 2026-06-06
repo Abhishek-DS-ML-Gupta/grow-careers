@@ -1,9 +1,11 @@
 ﻿from rest_framework import viewsets
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import login
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.views import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
@@ -11,7 +13,7 @@ from datetime import timedelta
 from django.db.models import Count, Sum, Q
 from django.db import transaction
 from decimal import Decimal
-from wallet.models import Wallet, Purchase, Transaction
+from wallet_app.models import Wallet, Purchase, Transaction
 from .models import TradeObject, InvestmentPlan, Investment
 from .serializers import InvestmentPlanSerializer, TradeObjectSerializer
 
@@ -31,20 +33,78 @@ def plans_grid(request):
     return render(request, 'plans/grid.html', {'objects': objects})
 
 
+def how_it_works(request):
+    return render(request, 'plans/how_it_works.html')
+
+
+def support(request):
+    return render(request, 'plans/support.html')
+
+
+def object_detail(request, pk):
+    obj = get_object_or_404(TradeObject, pk=pk, is_active=True)
+    return render(request, 'plans/detail.html', {'object': obj})
+
+
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
+
+
+class AdminOnlyUserLoginForm(AuthenticationForm):
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if user.is_staff:
+            raise ValidationError("Admin users must log in via /admin.")
+
+from django.core.exceptions import ValidationError
+from django.contrib.auth import authenticate, login
+
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            messages.success(request, 'Account created successfully!')
-            return redirect('plans_grid')
+            messages.success(request, 'Account created successfully! Please log in.')
+            return redirect('login')
     else:
         form = UserCreationForm()
     return render(request, 'plans/signup.html', {'form': form})
 
 
+def superuser_success(request):
+    return render(request, 'plans/superuser_success.html')
+
+
+def create_superuser(request):
+    if not request.user.is_authenticated or not request.user.is_staff:
+        return redirect('login')
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
+            messages.success(request, 'Superuser created successfully!')
+            return redirect('superuser_success')
+    else:
+        form = UserCreationForm()
+    return render(request, 'plans/create_superuser.html', {'form': form})
+
+
+def user_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            return redirect('home')
+    else:
+        form = AuthenticationForm(request)
+    return render(request, 'plans/login.html', {'form': form})
+
+
 @login_required
+@user_passes_test(is_admin)
 def dashboard(request):
     investments = Investment.objects.filter(user=request.user).select_related('plan__object')
     return render(request, 'plans/dashboard.html', {'investments': investments})
@@ -197,7 +257,7 @@ def admin_add_plan(request):
     if request.method == 'POST':
         obj_id = request.POST.get('object')
         obj = get_object_or_404(TradeObject, pk=obj_id)
-        plan = InvestmentPlan.objects.create(
+        plan = InvestmentPlan(
             object=obj,
             name=request.POST.get('name'),
             price_inr=request.POST.get('price_inr', 0),
@@ -208,6 +268,8 @@ def admin_add_plan(request):
             is_active=request.POST.get('is_active') == 'on',
             order=request.POST.get('order', 0),
         )
+        plan.full_clean()
+        plan.save()
         messages.success(request, f'Plan "{plan.name}" created successfully!')
         return redirect('admin_plans')
     return render(request, 'plans/admin/plan_form.html', {'objects': objects})
@@ -227,6 +289,7 @@ def admin_edit_plan(request, plan_id):
         plan.is_limited = request.POST.get('is_limited') == 'on'
         plan.is_active = request.POST.get('is_active') == 'on'
         plan.order = request.POST.get('order', 0)
+        plan.full_clean()
         plan.save()
         messages.success(request, f'Plan "{plan.name}" updated successfully!')
         return redirect('admin_plans')
@@ -254,7 +317,7 @@ def admin_investments(request):
 @user_passes_test(is_admin)
 def admin_users(request):
     users = User.objects.all().order_by('-date_joined')
-    context = {'users': users}
+    context = {'users': users, 'show_passwords': True}
     return render(request, 'plans/admin/users.html', context)
 
 

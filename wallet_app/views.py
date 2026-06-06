@@ -6,13 +6,17 @@ from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from plans.models import InvestmentPlan, Investment
 from .models import Wallet, Deposit, Purchase, Transaction, Product
-from .forms import DepositForm
+from .forms import DepositForm, ProductForm
+
+
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
 
 
 def get_wallet(user):
@@ -158,51 +162,43 @@ def purchase_plan(request, plan_id):
 
 
 @login_required
+@user_passes_test(is_admin)
 def admin_product_list(request):
     products = Product.objects.all().order_by('-created_at')
     return render(request, 'wallet/admin/products.html', {'products': products})
 
 
 @login_required
+@user_passes_test(is_admin)
 def admin_add_product(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
-        investment_amount = Decimal(request.POST.get('investment_amount', 0))
-        daily_return = Decimal(request.POST.get('daily_return', 0))
-        duration_days = int(request.POST.get('duration_days', 30))
-        active = request.POST.get('active') == 'on'
-
-        Product.objects.create(
-            name=name,
-            description=description,
-            investment_amount=investment_amount,
-            daily_return=daily_return,
-            duration_days=duration_days,
-            active=active,
-        )
-        messages.success(request, 'Product created successfully!')
-        return redirect('wallet_admin_products')
-    return render(request, 'wallet/admin/product_form.html')
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Product created successfully!')
+            return redirect('wallet_admin_products')
+    else:
+        form = ProductForm()
+    return render(request, 'wallet/admin/product_form.html', {'form': form})
 
 
 @login_required
+@user_passes_test(is_admin)
 def admin_edit_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if request.method == 'POST':
-        product.name = request.POST.get('name')
-        product.description = request.POST.get('description', '')
-        product.investment_amount = Decimal(request.POST.get('investment_amount', 0))
-        product.daily_return = Decimal(request.POST.get('daily_return', 0))
-        product.duration_days = int(request.POST.get('duration_days', 30))
-        product.active = request.POST.get('active') == 'on'
-        product.save()
-        messages.success(request, 'Product updated successfully!')
-        return redirect('wallet_admin_products')
-    return render(request, 'wallet/admin/product_form.html', {'product': product})
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Product updated successfully!')
+            return redirect('wallet_admin_products')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'wallet/admin/product_form.html', {'form': form, 'product': product})
 
 
 @login_required
+@user_passes_test(is_admin)
 def admin_delete_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if request.method == 'POST':

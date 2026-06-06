@@ -1,35 +1,45 @@
 {% extends "base.html" %}
-{% block title %}Invest - ObjectTrade{% endblock %}
+{% block title %}Confirm Investment - ObjectTrade{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="hero" style="padding: 40px 0 30px; text-align: left;">
-        <h1 style="font-size: 32px; margin-bottom: 4px;">{{ plan.name }}</h1>
-        <p style="color: rgba(255,255,255,0.9); font-size: 16px;">{{ plan.object.name }}</p>
+<div class="section">
+  <div class="plan-confirm-card">
+    <div class="plan-confirm-header">
+      <h1>Confirm Your Investment</h1>
+      <p class="plan-confirm-subtitle">Review the plan details before investing</p>
     </div>
-    <div class="card">
-        <div class="plan-stats">
-            <div class="plan-stat">
-                <p class="plan-stat-value">₹{{ plan.price_inr|floatformat:0 }}</p>
-                <p class="plan-stat-label">Investment</p>
-            </div>
-            <div class="plan-stat">
-                <p class="plan-stat-value">{{ plan.validity_days }}</p>
-                <p class="plan-stat-label">Days</p>
-            </div>
-            <div class="plan-stat highlight">
-                <p class="plan-stat-value">₹{{ plan.total_income_inr|floatformat:0 }}</p>
-                <p class="plan-stat-label">Total Income</p>
-            </div>
-            <div class="plan-stat">
-                <p class="plan-stat-value">₹{{ plan.daily_income_inr|floatformat:0 }}</p>
-                <p class="plan-stat-label">Daily Income</p>
-            </div>
-        </div>
-        <form method="post" style="display: flex; gap: 12px; margin-top: 24px;">
-            {% csrf_token %}
-            <a href="{% url 'plans_grid' %}" class="btn btn-secondary" style="flex: 1; justify-content: center;">Cancel</a>
-            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">Confirm Investment</button>
-        </form>
+
+    <div class="plan-confirm-body">
+      <div class="plan-detail-row">
+        <span class="plan-detail-label">Plan</span>
+        <span class="plan-detail-value">{{ plan.name }}</span>
+      </div>
+      <div class="plan-detail-row">
+        <span class="plan-detail-label">Object</span>
+        <span class="plan-detail-value">{{ plan.object.name }}</span>
+      </div>
+      <div class="plan-detail-row">
+        <span class="plan-detail-label">Investment Amount</span>
+        <span class="plan-detail-value plan-detail-price">₹{{ plan.price_inr|floatformat:0 }}</span>
+      </div>
+      <div class="plan-detail-row">
+        <span class="plan-detail-label">Validity</span>
+        <span class="plan-detail-value">{{ plan.validity_days }} days</span>
+      </div>
+      <div class="plan-detail-row">
+        <span class="plan-detail-label">Total Income</span>
+        <span class="plan-detail-value highlight-income">₹{{ plan.total_income_inr|floatformat:0 }}</span>
+      </div>
+      <div class="plan-detail-row">
+        <span class="plan-detail-label">Daily Income</span>
+        <span class="plan-detail-value">₹{{ plan.daily_income_inr|floatformat:0 }}</span>
+      </div>
     </div>
+
+    <form method="post" class="plan-confirm-actions">
+      {% csrf_token %}
+      <a href="{% url 'plans_grid' %}" class="btn btn-ghost btn-cancel">Cancel</a>
+      <button type="submit" class="btn btn-primary-gradient btn-confirm">Confirm Investment</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

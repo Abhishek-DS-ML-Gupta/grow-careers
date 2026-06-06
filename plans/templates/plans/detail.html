@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ object.name }} - ObjectTrade{% endblock %}
+{% block content %}
+<div class="section">
+  <a href="{% url 'home' %}" class="back-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Objects
+  </a>
+
+  <div class="product-layout">
+    <div class="product-gallery">
+      <div class="product-main-image">
+        {% if object.image_url %}
+        <img src="{{ object.image_url }}" alt="{{ object.name }}">
+        {% else %}
+        <img src="https://images.unsplash.com/{% if object.category == 'vehicle' %}photo-1503376780353-7e6692767b70{% elif object.category == 'property' %}photo-1545324418-cc1a3fa10c00{% elif object.category == 'electronics' %}photo-1498049794561-7780e7231661{% else %}photo-1560472354-b33ff0c44a43{% endif %}?w=800&q=80" alt="{{ object.name }}" onerror="this.src='https://placehold.co/600x400/f5f3ff/6366f1?text={{ object.category|title }}'">
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="product-info">
+      <div class="product-breadcrumb">{{ object.get_category_display }}</div>
+      <h1 class="product-title">{{ object.name }}</h1>
+
+      <div class="product-pricing">
+        <div class="product-price-main">₹{{ object.market_value_inr|floatformat:0 }}</div>
+        <div class="product-price-label">Market Value</div>
+      </div>
+
+      <div class="product-highlights">
+        <div class="highlight-item">
+          <div class="highlight-label">Category</div>
+          <div class="highlight-value">{{ object.get_category_display }}</div>
+        </div>
+        <div class="highlight-item">
+          <div class="highlight-label">Status</div>
+          <div class="highlight-value">
+            {% if object.is_active %}
+            <span class="badge badge-success">Active</span>
+            {% else %}
+            <span class="badge badge-danger">Inactive</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="highlight-item">
+          <div class="highlight-label">Created</div>
+          <div class="highlight-value">{{ object.created_at|date:"M d, Y" }}</div>
+        </div>
+      </div>
+
+      {% if object.description %}
+      <div class="product-description">
+        <h3>About this object</h3>
+        <p>{{ object.description }}</p>
+      </div>
+      {% endif %}
+
+      <div class="product-cta">
+        <div class="plans-count-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          {{ object.plans.count }} Plans available
+        </div>
+        <a href="#plans-section" class="btn btn-primary-gradient btn-lg">View Plans</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="plans-section" class="plans-section-anchor"></div>
+
+  <h2 class="plans-section-title">Choose Your Plan</h2>
+
+  <div class="plans-grid-modern">
+    {% for plan in object.plans.all %}
+    <div class="plan-card-modern">
+      {% if plan.is_limited %}
+      <div class="plan-badge-modern">Limited Offer</div>
+      {% endif %}
+      <div class="plan-card-header">
+        <div class="plan-card-header-text">
+          <h3 class="plan-card-title">{{ plan.name }}</h3>
+          <p class="plan-card-subtitle">{{ plan.validity_days }} days validity</p>
+        </div>
+      </div>
+      <div class="plan-card-body">
+        <div class="plan-price-row">
+          <span class="plan-price-label">Investment</span>
+          <span class="plan-price-value">₹{{ plan.price_inr|floatformat:0 }}</span>
+        </div>
+        <div class="plan-metrics">
+          <div class="plan-metric">
+            <div class="plan-metric-value highlight">₹{{ plan.total_income_inr|floatformat:0 }}</div>
+            <div class="plan-metric-label">Total Income</div>
+          </div>
+          <div class="plan-metric">
+            <div class="plan-metric-value">₹{{ plan.daily_income_inr|floatformat:0 }}</div>
+            <div class="plan-metric-label">Daily Income</div>
+          </div>
+        </div>
+      </div>
+      <div class="plan-card-footer">
+        <div class="plan-card-price">₹{{ plan.price_inr|floatformat:0 }}</div>
+        <a href="{% url 'invest' plan.id %}" class="btn btn-primary-gradient btn-block">
+          Invest Now
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state-modern">
+      <p>No plans available for this object right now.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
