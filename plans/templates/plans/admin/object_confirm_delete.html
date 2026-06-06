@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Delete Object - ObjectTrade{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto space-y-6">
+    <h1 class="text-2xl font-bold text-gray-900">Delete Object</h1>
+    <p class="text-sm text-gray-500">Are you sure you want to delete <strong>{{ object.name }}</strong>?</p>
+    <form method="post" class="bg-white rounded-2xl shadow-sm border border-red-100 p-6 space-y-4">
+        {% csrf_token %}
+        <p class="text-sm text-red-700">This action cannot be undone. All associated plans may be affected.</p>
+        <div class="flex gap-3">
+            <a href="{% url 'admin_objects' %}" class="flex-1 text-center rounded-lg border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">Cancel</a>
+            <button type="submit" class="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition">Delete</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

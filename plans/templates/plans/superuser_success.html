@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Superuser Created - ObjectTrade{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-8">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">Superuser Created!</h1>
+            <p class="text-gray-500 text-sm mt-2">The admin user has been created successfully.</p>
+        </div>
+
+        <div class="space-y-3">
+            <a href="{% url 'login' %}" class="block w-full rounded-lg bg-milky-600 py-2.5 text-sm font-semibold text-white hover:bg-milky-700 transition shadow-sm text-center">Go to Login</a>
+            <a href="{% url 'plans_grid' %}" class="block w-full rounded-lg border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition text-center">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{% if plan %}Edit{% else %}Add{% endif %} Plan - ObjectTrade{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto space-y-6">
+    <h1 class="text-2xl font-bold text-gray-900">{% if plan %}Edit{% else %}Add{% endif %} Investment Plan</h1>
+    <a href="{% url 'admin_plans' %}" class="text-sm font-medium text-milky-600 hover:text-milky-700">← Back to Plans</a>
+
+    {% if messages %}
+    <div class="space-y-2">
+        {% for message in messages %}
+        <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="bg-white rounded-2xl shadow-sm border border-milky-100 p-6 space-y-4">
+        {% csrf_token %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Trade Object</label>
+            <select name="object" required class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-milky-500 focus:border-transparent">
+                {% for o in objects %}
+                <option value="{{ o.id }}" {% if plan and plan.object.id == o.id %}selected{% endif %}>{{ o.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Plan Name</label>
+            <input type="text" name="name" value="{% if plan %}{{ plan.name }}{% endif %}" required class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-milky-500 focus:border-transparent" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Price (INR)</label>
+                <input type="number" name="price_inr" value="{% if plan %}{{ plan.price_inr }}{% endif %}" required min="0" class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-milky-500 focus:border-transparent" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Validity (days)</label>
+                <input type="number" name="validity_days" value="{% if plan %}{{ plan.validity_days }}{% endif %}" required min="1" class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-milky-500 focus:border-transparent" />
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Total Income (INR)</label>
+                <input type="number" name="total_income_inr" value="{% if plan %}{{ plan.total_income_inr }}{% endif %}" required min="0" class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-milky-500 focus:border-transparent" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Daily Income (INR)</label>
+                <input type="number" name="daily_income_inr" value="{% if plan %}{{ plan.daily_income_inr }}{% endif %}" required min="0" class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-milky-500 focus:border-transparent" />
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                <input type="number" name="order" value="{% if plan %}{{ plan.order }}{% endif %}" min="0" class="w-full rounded-lg border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-milky-500 focus:border-transparent" />
+            </div>
+            <div class="flex items-end gap-4">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="is_limited" id="is_limited" {% if plan and plan.is_limited %}checked{% endif %} class="rounded border-gray-300 text-milky-600 focus:ring-milky-500" />
+                    <label for="is_limited" class="text-sm text-gray-700">Limited</label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="is_active" id="is_active" {% if not plan or plan.is_active %}checked{% endif %} class="rounded border-gray-300 text-milky-600 focus:ring-milky-500" />
+                    <label for="is_active" class="text-sm text-gray-700">Active</label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="w-full rounded-lg bg-milky-600 py-2.5 text-sm font-semibold text-white hover:bg-milky-700 transition shadow-sm">{% if plan %}Update{% else %}Create{% endif %} Plan</button>
+    </form>
+</div>
+{% endblock %}

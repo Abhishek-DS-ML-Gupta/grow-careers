@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}All Users - ObjectTrade{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Users</h1>
+            <p class="text-gray-500 mt-1">All registered users</p>
+        </div>
+    </div>
+    <a href="{% url 'admin_dashboard' %}" class="text-sm font-medium text-milky-600 hover:text-milky-700">← Back to Dashboard</a>
+
+    <div class="overflow-x-auto">
+        <table class="w-full bg-white rounded-2xl shadow-sm border border-milky-100 overflow-hidden">
+            <thead class="bg-milky-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Username</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Joined</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Investments</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for u in users %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ u.username }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ u.email|default:"—" }}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-md text-xs font-medium {% if u.is_staff %}bg-purple-100 text-purple-700{% else %}bg-gray-100 text-gray-600{% endif %}">{% if u.is_staff %}Admin{% else %}User{% endif %}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ u.date_joined|date:"M d, Y" }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ u.investments.count }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">No users found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
