@@ -83,8 +83,8 @@ def create_superuser(request):
             user.is_staff = True
             user.is_superuser = True
             user.save()
-            auth_login(request, user)
-            return redirect('plans_grid')
+            messages.success(request, 'Superuser created successfully! Use these credentials to log in at /admin/')
+            return redirect('superuser_success')
     else:
         form = UserCreationForm()
     return render(request, 'plans/create_superuser.html', {'form': form})
@@ -92,12 +92,12 @@ def create_superuser(request):
 
 def user_login(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = AdminOnlyUserLoginForm(request, data=request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
             return redirect('home')
     else:
-        form = AuthenticationForm(request)
+        form = AdminOnlyUserLoginForm(request)
     return render(request, 'plans/login.html', {'form': form})
 
 
