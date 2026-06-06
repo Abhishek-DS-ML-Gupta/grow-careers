@@ -1,14 +1,5 @@
 Django==5.2.15
 djangorestframework==3.17.1
-gunicorn==23.0.0
-Flask==2.1.2
-Werkzeug==2.1.2
-Jinja2==3.1.2
-MarkupSafe==2.1.1
-click==8.4.1
-itsdangerous==2.2.0
-sqlparse==0.5.5
-tzdata==2026.2
-asgiref==3.11.1
-typing_extensions==4.15.0
-dj-database-url
+dj-database-url==0.5.0
+psycopg[binary]
+gunicorn
