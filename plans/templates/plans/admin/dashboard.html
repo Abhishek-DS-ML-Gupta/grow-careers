@@ -1,94 +1,133 @@
 {% extends "base.html" %}
 {% block title %}Admin Dashboard - ObjectTrade{% endblock %}
 {% block content %}
-<div class="space-y-6">
-    <div class="flex items-center justify-between">
+<div>
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p class="text-gray-500 mt-1">Overview of your project</p>
+            <h1 style="font-size: 32px; font-weight: 800; color: var(--text-primary);">Admin Dashboard</h1>
+            <p style="color: var(--text-secondary); margin-top: 4px;">Overview of your platform</p>
         </div>
-        <span class="px-3 py-1 rounded-lg bg-purple-100 text-purple-700 text-sm font-medium">Admin Panel</span>
+        <span class="badge badge-info" style="font-size: 14px; padding: 8px 16px;">Admin Panel</span>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <p class="text-sm text-gray-500 font-medium">Total Users</p>
-            <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_users }}</p>
-            <p class="text-xs text-gray-400 mt-1">{{ total_admins }} admins</p>
+    <div class="stats-grid" style="margin-bottom: 32px;">
+        <div class="dash-stat">
+            <div class="dash-stat-icon balance" style="font-size: 20px;">👥</div>
+            <div class="dash-stat-info">
+                <h4>Total Users</h4>
+                <p>{{ total_users }}</p>
+            </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <p class="text-sm text-gray-500 font-medium">Trade Objects</p>
-            <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_objects }}</p>
+        <div class="dash-stat">
+            <div class="dash-stat-icon deposit" style="font-size: 20px;">📦</div>
+            <div class="dash-stat-info">
+                <h4>Trade Objects</h4>
+                <p>{{ total_objects }}</p>
+            </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <p class="text-sm text-gray-500 font-medium">Investment Plans</p>
-            <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_plans }}</p>
+        <div class="dash-stat">
+            <div class="dash-stat-icon withdrawal" style="font-size: 20px;">📋</div>
+            <div class="dash-stat-info">
+                <h4>Investment Plans</h4>
+                <p>{{ total_plans }}</p>
+            </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <p class="text-sm text-gray-500 font-medium">Total Investments</p>
-            <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_investments }}</p>
-            <p class="text-xs text-emerald-600 font-medium mt-1">{{ active_investments }} active</p>
+        <div class="dash-stat">
+            <div class="dash-stat-icon income" style="font-size: 20px;">💼</div>
+            <div class="dash-stat-info">
+                <h4>Total Investments</h4>
+                <p>{{ total_investments }}</p>
+            </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <p class="text-sm text-gray-500 font-medium">Total Invested Amount</p>
-            <p class="text-2xl font-bold text-gray-900 mt-1">₹{{ total_invested|floatformat:0 }}</p>
+    <div class="stats-grid" style="margin-bottom: 32px;">
+        <div class="dash-stat">
+            <div class="dash-stat-icon balance" style="font-size: 20px;">💰</div>
+            <div class="dash-stat-info">
+                <h4>Total Invested</h4>
+                <p>₹{{ total_invested|floatformat:0 }}</p>
+            </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <p class="text-sm text-gray-500 font-medium">Total Earned</p>
-            <p class="text-2xl font-bold text-emerald-600 mt-1">₹{{ total_earned|floatformat:0 }}</p>
+        <div class="dash-stat">
+            <div class="dash-stat-icon deposit" style="font-size: 20px;">📈</div>
+            <div class="dash-stat-info">
+                <h4>Total Earned</h4>
+                <p>₹{{ total_earned|floatformat:0 }}</p>
+            </div>
+        </div>
+        <div class="dash-stat">
+            <div class="dash-stat-icon income" style="font-size: 20px;">⭐</div>
+            <div class="dash-stat-info">
+                <h4>Active Investments</h4>
+                <p>{{ active_investments }}</p>
+            </div>
+        </div>
+        <div class="dash-stat">
+            <div class="dash-stat-icon withdrawal" style="font-size: 20px;">👑</div>
+            <div class="dash-stat-info">
+                <h4>Total Admins</h4>
+                <p>{{ total_admins }}</p>
+            </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <h2 class="text-lg font-bold text-gray-900 mb-4">Recent Users</h2>
+    <div class="stats-grid" style="margin-bottom: 32px;">
+        <div class="card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">Recent Users</h3>
+                <a href="{% url 'admin_users' %}" class="nav-link" style="font-size: 13px;">View all →</a>
+            </div>
             {% if recent_users %}
             <div class="space-y-3">
                 {% for u in recent_users %}
-                <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);">
                     <div>
-                        <p class="text-sm font-semibold text-gray-800">{{ u.username }}</p>
-                        <p class="text-xs text-gray-400">{{ u.date_joined|date:"M d, Y" }}</p>
+                        <p style="font-size: 14px; font-weight: 600; color: var(--text-primary);">{{ u.username }}</p>
+                        <p style="font-size: 12px; color: var(--text-secondary);">{{ u.date_joined|date:"M d, Y" }}</p>
                     </div>
-                    <span class="px-2 py-1 rounded-md text-xs font-medium {% if u.is_staff %}bg-purple-100 text-purple-700{% else %}bg-gray-100 text-gray-600{% endif %}">{% if u.is_staff %}Admin{% else %}User{% endif %}</span>
+                    {% if u.is_staff %}
+                    <span class="badge badge-info">Admin</span>
+                    {% else %}
+                    <span class="badge">User</span>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <p class="text-sm text-gray-500">No users yet.</p>
+            <p style="color: var(--text-secondary); font-size: 14px;">No users yet.</p>
             {% endif %}
-            <a href="{% url 'admin_users' %}" class="block mt-4 text-sm font-medium text-milky-600 hover:text-milky-700">View all users →</a>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-5">
-            <h2 class="text-lg font-bold text-gray-900 mb-4">Recent Investments</h2>
+
+        <div class="card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">Recent Investments</h3>
+                <a href="{% url 'admin_investments' %}" class="nav-link" style="font-size: 13px;">View all →</a>
+            </div>
             {% if recent_investments %}
             <div class="space-y-3">
                 {% for inv in recent_investments %}
-                <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);">
                     <div>
-                        <p class="text-sm font-semibold text-gray-800">{{ inv.user.username }} → {{ inv.plan.name }}</p>
-                        <p class="text-xs text-gray-400">₹{{ inv.invested_amount|floatformat:0 }} · {{ inv.created_at|date:"M d, Y" }}</p>
+                        <p style="font-size: 14px; font-weight: 600; color: var(--text-primary);">{{ inv.user.username }}</p>
+                        <p style="font-size: 12px; color: var(--text-secondary);">{{ inv.plan.name }} · ₹{{ inv.invested_amount|floatformat:0 }}</p>
                     </div>
-                    <span class="px-2 py-1 rounded-md text-xs font-medium {% if inv.status == 'active' %}bg-emerald-100 text-emerald-700{% elif inv.status == 'completed' %}bg-blue-100 text-blue-700{% else %}bg-red-100 text-red-700{% endif %}">{{ inv.status|capfirst }}</span>
+                    <span class="badge badge-{% if inv.status == 'active' %}success{% elif inv.status == 'completed' %}info{% else %}danger{% endif %}">{{ inv.status|capfirst }}</span>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <p class="text-sm text-gray-500">No investments yet.</p>
+            <p style="color: var(--text-secondary); font-size: 14px;">No investments yet.</p>
             {% endif %}
-            <a href="{% url 'admin_investments' %}" class="block mt-4 text-sm font-medium text-milky-600 hover:text-milky-700">View all investments →</a>
         </div>
     </div>
 
-    <div class="flex flex-wrap gap-3">
-        <a href="{% url 'admin_objects' %}" class="px-4 py-2 rounded-lg bg-milky-600 text-white text-sm font-semibold hover:bg-milky-700 transition">Manage Objects</a>
-        <a href="{% url 'admin_plans' %}" class="px-4 py-2 rounded-lg bg-milky-600 text-white text-sm font-semibold hover:bg-milky-700 transition">Manage Plans</a>
-        <a href="{% url 'admin_investments' %}" class="px-4 py-2 rounded-lg bg-milky-600 text-white text-sm font-semibold hover:bg-milky-700 transition">View Investments</a>
-        <a href="{% url 'admin_users' %}" class="px-4 py-2 rounded-lg bg-milky-600 text-white text-sm font-semibold hover:bg-milky-700 transition">View Users</a>
-        <a href="{% url 'plans_grid' %}" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition">Back to Site</a>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+        <a href="{% url 'admin_objects' %}" class="btn btn-primary">Manage Objects</a>
+        <a href="{% url 'admin_plans' %}" class="btn btn-primary">Manage Plans</a>
+        <a href="{% url 'admin_investments' %}" class="btn btn-primary">View Investments</a>
+        <a href="{% url 'admin_users' %}" class="btn btn-primary">View Users</a>
+        <a href="{% url 'plans_grid' %}" class="btn btn-secondary">Back to Site</a>
     </div>
 </div>
 {% endblock %}

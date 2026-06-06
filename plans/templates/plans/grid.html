@@ -1,99 +1,80 @@
 {% extends "base.html" %}
 {% block title %}Investment Plans - ObjectTrade{% endblock %}
 {% block content %}
+<div>
+  <div class="section-header-left">
+    <div>
+      <h1 class="section-title">Trade Objects</h1>
+      <p class="section-subtitle">Choose an object and plan to start earning daily returns</p>
+    </div>
+    <div class="live-status">
+      <span class="status-dot"></span>
+      Live trading active
+    </div>
+  </div>
 
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">Trade Objects</h1>
-            <p class="text-gray-500 mt-1">Choose an object and plan to start earning daily returns</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-milky-100 text-milky-700 text-sm font-medium">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-milky-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-milky-500"></span>
-                </span>
-                Live trading active
-            </span>
-        </div>
+  {% for obj in objects %}
+  <div class="plans-section">
+    <div class="object-header">
+      <div class="stat-icon object-icon" style="margin: 0;">{% if obj.category == 'vehicle' %}🚗{% elif obj.category == 'property' %}🏠{% elif obj.category == 'electronics' %}📱{% else %}📦{% endif %}</div>
+      <div>
+        <h2 class="object-name">{{ obj.name }}</h2>
+        <p class="object-market">Market Value: <span>₹{{ obj.market_value_inr|floatformat:0 }}</span></p>
+      </div>
     </div>
 
-    {% for obj in objects %}
-    <div class="space-y-4">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-milky-400 to-milky-600 flex items-center justify-center text-white">
-                {% if obj.category == 'vehicle' %}
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8m-8 4h8m-4 4v3m-6 0h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                {% elif obj.category == 'property' %}
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                {% elif obj.category == 'electronics' %}
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                {% else %}
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                {% endif %}
-            </div>
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">{{ obj.name }}</h2>
-                <p class="text-sm text-gray-500">Market Value: <span class="font-semibold text-gray-700">₹{{ obj.market_value_inr|floatformat:0 }}</span></p>
-            </div>
+    <div class="plans-grid">
+      {% for plan in obj.plans.all %}
+      <div class="plan-card">
+        {% if plan.is_limited %}
+        <div class="plan-badge">Limited</div>
+        {% endif %}
+        <div class="plan-header">
+          <div class="plan-name">{{ plan.name }}</div>
+          <div class="plan-price">₹{{ plan.price_inr|floatformat:0 }}</div>
+          <div class="plan-validity">{{ plan.validity_days }} days validity</div>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {% for plan in obj.plans.all %}
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition border border-milky-100 flex flex-col overflow-hidden">
-                <div class="p-5 flex-1">
-                    <div class="flex items-start justify-between mb-4">
-                        <h3 class="text-base font-bold text-gray-900">{{ plan.name }}</h3>
-                        {% if plan.is_limited %}
-                        <span class="px-2 py-1 text-xs font-bold bg-amber-50 text-amber-700 rounded-lg border border-amber-100">Limited</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
-                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Price</p>
-                                <p class="text-lg font-bold text-gray-900 mt-0.5">₹{{ plan.price_inr|floatformat:0 }}</p>
-                        </div>
-                        <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
-                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Validity</p>
-                            <p class="text-lg font-bold text-gray-900 mt-0.5">{{ plan.validity_days }} days</p>
-                        </div>
-                        <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
-                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Total Income</p>
-                            <p class="text-lg font-bold text-emerald-600 mt-0.5">₹{{ plan.total_income_inr|floatformat:0 }}</p>
-                            <div class="bg-milky-50/70 rounded-xl p-3 border border-milky-100">
-                                <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Daily Income</p>
-                                <p class="text-lg font-bold text-milky-700 mt-0.5">₹{{ plan.daily_income_inr|floatformat:0 }}</p>
-                        </div>
-                    </div>
-
-                    {% if user.is_authenticated %}
-                    <a href="{% url 'invest' plan.id %}"
-                       class="mt-4 block w-full text-center rounded-xl bg-milky-600 py-2.5 text-sm font-semibold text-white hover:bg-milky-700 transition shadow-sm">
-                        Invest Now
-                    </a>
-                    {% else %}
-                    <a href="{% url 'login' %}"
-                       class="mt-4 block w-full text-center rounded-xl bg-milky-600 py-2.5 text-sm font-semibold text-white hover:bg-milky-700 transition shadow-sm">
-                        Login to Invest
-                    </a>
-                    {% endif %}
-                </div>
+        <div class="plan-body">
+          <div class="plan-stats">
+            <div class="plan-stat">
+              <p class="plan-stat-value">₹{{ plan.price_inr|floatformat:0 }}</p>
+              <p class="plan-stat-label">Price</p>
             </div>
-            {% empty %}
-            <div class="md:col-span-2 xl:col-span-3 text-center text-gray-500 py-12">
-                No plans available for this object.
+            <div class="plan-stat">
+              <p class="plan-stat-value">{{ plan.validity_days }}</p>
+              <p class="plan-stat-label">Days</p>
             </div>
-            {% endfor %}
+            <div class="plan-stat highlight">
+              <p class="plan-stat-value">₹{{ plan.total_income_inr|floatformat:0 }}</p>
+              <p class="plan-stat-label">Total Income</p>
+            </div>
+            <div class="plan-stat">
+              <p class="plan-stat-value">₹{{ plan.daily_income_inr|floatformat:0 }}</p>
+              <p class="plan-stat-label">Daily Income</p>
+            </div>
+          </div>
         </div>
+        <div class="plan-footer">
+          {% if user.is_authenticated %}
+          <a href="{% url 'invest' plan.id %}" class="plan-btn">Invest Now</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="plan-btn">Login to Invest</a>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-plans">
+        No plans available for this object.
+      </div>
+      {% endfor %}
     </div>
-    {% empty %}
-    <div class="text-center text-gray-500 py-16">
-        <p class="text-lg">No objects available at the moment.</p>
-        <p class="text-sm mt-2">Please check back later.</p>
-    </div>
-    {% endfor %}
+  </div>
+  {% empty %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📦</div>
+    <h3>No objects available</h3>
+    <p>Please check back later for new investment opportunities.</p>
+  </div>
+  {% endfor %}
 </div>
-
 {% endblock %}

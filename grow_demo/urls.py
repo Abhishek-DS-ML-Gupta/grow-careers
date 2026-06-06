@@ -1,6 +1,6 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
@@ -41,8 +41,10 @@ def create_superuser(request):
     return render(request, 'plans/create_superuser.html', {'form': form})
 
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('wallet/', include('wallet.urls')),
     path('', plan_views.plans_grid, name='home'),
     path('plan/', plan_views.plans_grid, name='plans_grid'),
     path('dashboard/', plan_views.dashboard, name='dashboard'),

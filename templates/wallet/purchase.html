@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Investment Purchased - ObjectTrade{% endblock %}
+{% block content %}
+<div class="container" style="padding-top: 40px; padding-bottom: 40px;">
+    {% if messages %}
+    <div class="alerts" style="margin-bottom: 24px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="max-width: 480px; margin: 0 auto;">
+        <div class="card" style="background: linear-gradient(145deg, #1e293b, #0f172a); border-color: #334155;">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--success), #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 28px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);">
+                    ✓
+                </div>
+                <h1 style="font-size: 24px; font-weight: 800; color: white; margin-bottom: 8px;">Investment Purchased Successfully</h1>
+                <p style="color: rgba(255,255,255,0.7); font-size: 15px;">You have successfully purchased the plan.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius); padding: 20px; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <span style="color: rgba(255,255,255,0.6); font-size: 14px;">Plan</span>
+                    <span style="color: white; font-weight: 600; font-size: 14px;">{{ product.name }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <span style="color: rgba(255,255,255,0.6); font-size: 14px;">Amount Paid</span>
+                    <span style="color: rgb(252, 165, 165); font-weight: 700; font-size: 15px;">INR {{ purchase.amount|floatformat:2 }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <span style="color: rgba(255,255,255,0.6); font-size: 14px;">Status</span>
+                    <span style="color: rgb(134, 239, 172); font-weight: 600; font-size: 14px;">{{ purchase.status }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                    <span style="color: rgba(255,255,255,0.6); font-size: 14px;">Wallet Balance After</span>
+                    <span style="color: white; font-weight: 700; font-size: 15px;">INR {{ wallet.balance|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <a href="{% url 'wallet_dashboard' %}" class="btn btn-primary btn-lg" style="display: block; text-align: center;">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

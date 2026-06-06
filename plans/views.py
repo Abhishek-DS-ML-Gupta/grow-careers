@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+﻿from rest_framework import viewsets
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login
@@ -7,8 +7,11 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta, date
+from datetime import timedelta
 from django.db.models import Count, Sum, Q
+from django.db import transaction
+from decimal import Decimal
+from wallet.models import Wallet, Purchase, Transaction
 from .models import TradeObject, InvestmentPlan, Investment
 from .serializers import InvestmentPlanSerializer, TradeObjectSerializer
 
@@ -49,22 +52,46 @@ def dashboard(request):
 
 @login_required
 def invest(request, plan_id):
-    plan = InvestmentPlan.objects.filter(pk=plan_id, is_active=True).first()
-    if not plan:
-        messages.error(request, 'Plan not found.')
-        return redirect('plans_grid')
+    plan = get_object_or_404(InvestmentPlan, pk=plan_id, is_active=True)
 
     if request.method == 'POST':
-        investment = Investment.objects.create(
-            user=request.user,
-            plan=plan,
-            invested_amount=plan.price_inr,
-            start_date=timezone.now().date(),
-            end_date=timezone.now().date() + timedelta(days=plan.validity_days),
-            status='active',
-        )
+        wallet = Wallet.objects.filter(user=request.user).first()
+        amount = Decimal(plan.price_inr)
+
+        if not wallet or wallet.balance < amount:
+            messages.error(request, 'Insufficient Wallet Balance. Please deposit funds first.')
+            return redirect('wallet_deposit')
+
+        with transaction.atomic():
+            wallet.balance -= amount
+            wallet.total_withdrawal += amount
+            wallet.save(update_fields=['balance', 'total_withdrawal', 'updated_at'])
+
+            purchase = Purchase.objects.create(
+                user=request.user,
+                product=plan,
+                amount=amount,
+                status='ACTIVE',
+            )
+            Transaction.objects.create(
+                user=request.user,
+                txn_type='PURCHASE',
+                amount=-amount,
+                reference_id=f"PUR-{purchase.id}",
+                purchase=purchase,
+            )
+
+            investment = Investment.objects.create(
+                user=request.user,
+                plan=plan,
+                invested_amount=plan.price_inr,
+                start_date=timezone.now().date(),
+                end_date=timezone.now().date() + timedelta(days=plan.validity_days),
+                status='active',
+            )
+
         messages.success(request, f'Successfully invested in {plan.name}!')
-        return redirect('dashboard')
+        return render(request, 'wallet/purchase.html', {'plan': plan, 'purchase': purchase, 'wallet': wallet})
 
     return render(request, 'plans/invest.html', {'plan': plan})
 
@@ -229,3 +256,5 @@ def admin_users(request):
     users = User.objects.all().order_by('-date_joined')
     context = {'users': users}
     return render(request, 'plans/admin/users.html', context)
+
+

@@ -4,10 +4,13 @@ set -e
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
+echo "Creating static directory..."
+mkdir -p static/css
+
 echo "Running migrations..."
 python manage.py migrate --noinput
 
 echo "Collecting static files..."
-python manage.py collectstatic --noinput || true
+python manage.py collectstatic --noinput
 
 echo "Build complete"

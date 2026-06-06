@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Wallet Dashboard - ObjectTrade{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div style="margin-bottom: 24px;">
+        <h1 class="section-title" style="text-shadow: none; color: var(--text-primary);">Wallet Dashboard</h1>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="dash-stat">
+            <div class="dash-stat-icon balance">₹</div>
+            <div class="dash-stat-info">
+                <h4>Balance</h4>
+                <p>INR {{ wallet.balance|floatformat:2 }}</p>
+            </div>
+        </div>
+        <div class="dash-stat">
+            <div class="dash-stat-icon deposit">↓</div>
+            <div class="dash-stat-info">
+                <h4>Total Deposit</h4>
+                <p>INR {{ wallet.total_deposit|floatformat:2 }}</p>
+            </div>
+        </div>
+        <div class="dash-stat">
+            <div class="dash-stat-icon withdrawal">↑</div>
+            <div class="dash-stat-info">
+                <h4>Total Withdrawal</h4>
+                <p>INR {{ wallet.total_withdrawal|floatformat:2 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 32px;">
+        <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--text-primary);">Transaction History</h2>
+        {% if transactions %}
+        <div class="table-container" style="box-shadow: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for txn in transactions %}
+                    <tr>
+                        <td>
+                            <span class="badge badge-info">{{ txn.txn_type }}</span>
+                        </td>
+                        <td style="color: var(--text-secondary);">{{ txn.created_at|date:'M d, Y H:i' }}</td>
+                        <td>
+                            <span style="font-weight: 700; {% if txn.amount|floatformat:2|slice:'-':1 == '-' %}color: var(--danger);{% else %}color: var(--success);{% endif %}">
+                                {% if txn.amount|floatformat:2|slice:'-':1 == '-' %}-{% endif %}INR {{ txn.amount|floatformat:2|slice:'0' }}
+                            </span>
+                        </td>
+                        <td style="color: var(--text-secondary); font-size: 12px;">{{ txn.reference_id }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>No transactions yet</h3>
+            <p>Start by depositing funds to your wallet</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="{% url 'wallet_deposit' %}" class="btn btn-primary">Deposit Funds</a>
+        <a href="{% url 'plans_grid' %}" class="btn btn-secondary">Browse Plans</a>
+    </div>
+</div>
+{% endblock %}

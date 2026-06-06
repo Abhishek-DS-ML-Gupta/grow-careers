@@ -4,13 +4,28 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ObjectTrade - Premium Investment Platform" />
     <title>{% block title %}ObjectTrade{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#c7d2fe',
+                            200: '#a5b4fc',
+                            300: '#818cf8',
+                            400: '#6366f1',
+                            500: '#4f46e5',
+                            600: '#4338ca',
+                            700: '#3730a3',
+                            800: '#312e81',
+                            900: '#1e1b4b',
+                        },
                         milky: {
                             50: '#f8faff',
                             100: '#f0f6ff',
@@ -28,63 +43,78 @@
             }
         }
     </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-    </style>
 </head>
-<body class="bg-milky-50 text-gray-800 min-h-screen">
-
-    <nav class="glass-card sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-milky-600 rounded-lg flex items-center justify-center text-white font-bold">OT</div>
-                    <span class="text-xl font-bold text-milky-800 tracking-tight">ObjectTrade</span>
-                </div>
-                <div class="hidden md:flex items-center space-x-1">
-                    <a href="/" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-milky-100 hover:text-milky-700 transition">Home</a>
-                    <a href="/plan/" class="px-3 py-2 rounded-lg text-sm font-medium text-milky-700 bg-milky-100">Plans</a>
-                    {% if user.is_authenticated %}
-                    <a href="/dashboard/" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-milky-100 hover:text-milky-700 transition">Dashboard</a>
-                    <form method="post" action="{% url 'logout' %}" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition">Logout</button>
-                    </form>
-                    {% else %}
-                    <a href="/login/" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-milky-100 hover:text-milky-700 transition">Login</a>
-                    <a href="/signup/" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-milky-600 hover:bg-milky-700 transition shadow-sm">Sign Up</a>
-                    {% endif %}
-                </div>
-            </div>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">OT</div>
+                <span class="logo-text">ObjectTrade</span>
+            </a>
+            <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18"/>
+                </svg>
+            </button>
+            <nav class="nav" id="main-nav">
+                <a href="/">Home</a>
+                <a href="/plan/">Plans</a>
+                {% if user.is_authenticated %}
+                <a href="/dashboard/">Dashboard</a>
+                <form method="post" action="{% url 'logout' %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link">Logout</button>
+                </form>
+                {% else %}
+                <a href="/login/">Login</a>
+                {% endif %}
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {% if messages %}
-        <div class="mb-6 space-y-2">
+    {% if messages %}
+    <div class="container">
+        <div class="alerts" style="margin-top: 24px;">
             {% for message in messages %}
-            <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            <div class="alert alert-{{ message.tags }}">
                 {{ message }}
             </div>
             {% endfor %}
         </div>
-        {% endif %}
+    </div>
+    {% endif %}
 
-        {% block content %}{% endblock %}
-    </main>
+    {% block content %}{% endblock %}
 
-    <footer class="mt-auto py-6 border-t border-milky-200 bg-white/60">
-        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-            <p class="mb-2">⚠️ This is a demo project for educational purposes only. No real investments, payments, or returns.</p>
-            <p>ObjectTrade Demo &copy; {% now 'Y' %}</p>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo-icon" style="width: 32px; height: 32px; font-size: 14px;">OT</div>
+                <span>ObjectTrade</span>
+            </div>
+            <div class="footer-links">
+                <a href="/plan/">Plans</a>
+                {% if user.is_authenticated %}
+                <a href="/dashboard/">Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="footer-copy">
+            <p>&copy; 2026 ObjectTrade. All rights reserved.</p>
         </div>
     </footer>
 
+    <script>
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const mainNav = document.getElementById('main-nav');
+        mobileToggle?.addEventListener('click', () => {
+            mainNav.classList.toggle('mobile-visible');
+        });
+        document.addEventListener('click', (e) => {
+            if (!mainNav.contains(e.target) && !mobileToggle.contains(e.target)) {
+                mainNav.classList.remove('mobile-visible');
+            }
+        });
+    </script>
 </body>
 </html>

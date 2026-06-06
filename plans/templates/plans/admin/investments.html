@@ -1,47 +1,50 @@
 {% extends "base.html" %}
 {% block title %}All Investments - ObjectTrade{% endblock %}
 {% block content %}
-<div class="space-y-6">
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">All Investments</h1>
-            <p class="text-gray-500 mt-1">View all user investments</p>
-        </div>
+<div>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 32px; font-weight: 800; color: var(--text-primary);">All Investments</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">View all user investments</p>
     </div>
-    <a href="{% url 'admin_dashboard' %}" class="text-sm font-medium text-milky-600 hover:text-milky-700">← Back to Dashboard</a>
-
-    <div class="overflow-x-auto">
-        <table class="w-full bg-white rounded-2xl shadow-sm border border-milky-100 overflow-hidden">
-            <thead class="bg-milky-50">
+    <a href="{% url 'admin_dashboard' %}" style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary); text-decoration: none; font-weight: 600; font-size: 14px; margin-bottom: 24px;">← Back to Dashboard</a>
+    <div class="table-container">
+        <table>
+            <thead>
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">User</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Plan</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Object</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Invested</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Start Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">End Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Earned</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Created</th>
+                    <th>User</th>
+                    <th>Plan</th>
+                    <th>Object</th>
+                    <th>Invested</th>
+                    <th>Status</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Earned</th>
+                    <th>Created</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody>
                 {% for inv in investments %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm font-semibold text-gray-800">{{ inv.user.username }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">{{ inv.plan.name }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ inv.plan.object.name }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">₹{{ inv.invested_amount|floatformat:0 }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 rounded-md text-xs font-medium {% if inv.status == 'active' %}bg-emerald-100 text-emerald-700{% elif inv.status == 'completed' %}bg-blue-100 text-blue-700{% else %}bg-red-100 text-red-700{% endif %}">{{ inv.status|capfirst }}</span>
+                <tr>
+                    <td style="font-weight: 600;">{{ inv.user.username }}</td>
+                    <td>{{ inv.plan.name }}</td>
+                    <td>{{ inv.plan.object.name }}</td>
+                    <td style="font-weight: 600;">₹{{ inv.invested_amount|floatformat:0 }}</td>
+                    <td>
+                        {% if inv.status == 'active' %}
+                        <span class="badge badge-success">Active</span>
+                        {% elif inv.status == 'completed' %}
+                        <span class="badge badge-info">Completed</span>
+                        {% else %}
+                        <span class="badge badge-danger">Cancelled</span>
+                        {% endif %}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ inv.start_date }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ inv.end_date }}</td>
-                    <td class="px-6 py-4 text-sm text-emerald-600 font-medium">₹{{ inv.total_earned|floatformat:0 }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ inv.created_at|date:"M d, Y" }}</td>
+                    <td style="color: var(--text-secondary);">{{ inv.start_date }}</td>
+                    <td style="color: var(--text-secondary);">{{ inv.end_date }}</td>
+                    <td style="color: var(--success); font-weight: 600;">₹{{ inv.total_earned|floatformat:0 }}</td>
+                    <td style="color: var(--text-secondary);">{{ inv.created_at|date:"M d, Y" }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="9" class="px-6 py-8 text-center text-sm text-gray-500">No investments found.</td></tr>
+                <tr><td colspan="9" style="text-align: center; padding: 32px; color: var(--text-secondary);">No investments found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
