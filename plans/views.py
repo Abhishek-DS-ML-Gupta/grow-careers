@@ -76,8 +76,6 @@ def superuser_success(request):
 
 
 def create_superuser(request):
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect('login')
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -85,8 +83,8 @@ def create_superuser(request):
             user.is_staff = True
             user.is_superuser = True
             user.save()
-            messages.success(request, 'Superuser created successfully!')
-            return redirect('superuser_success')
+            auth_login(request, user)
+            return redirect('plans_grid')
     else:
         form = UserCreationForm()
     return render(request, 'plans/create_superuser.html', {'form': form})
