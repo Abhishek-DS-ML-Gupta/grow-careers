@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Superuser Created - ObjectTrade{% endblock %}
 {% block content %}
-<div class="max-w-md mx-auto">
-    <div class="bg-white rounded-2xl shadow-sm border border-milky-100 p-8">
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+<div class="container" style="padding-top: 64px; padding-bottom: 64px;">
+    <div class="form-container" style="max-width: 440px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="width: 56px; height: 56px; background: #d1fae5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            <h1 class="text-2xl font-bold text-gray-900">Superuser Created!</h1>
-            <p class="text-gray-500 text-sm mt-2">The admin user has been created successfully.</p>
+            <h1 class="form-title" style="margin-bottom: 4px;">Superuser Created!</h1>
+            <p class="form-subtitle">The admin user has been created successfully.</p>
         </div>
 
         <div class="space-y-3">
-            <a href="/admin/" class="block w-full rounded-lg bg-milky-600 py-2.5 text-sm font-semibold text-white hover:bg-milky-700 transition shadow-sm text-center">Go to Admin Login</a>
-            <a href="{% url 'plans_grid' %}" class="block w-full rounded-lg border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition text-center">Back to Home</a>
+            <a href="/admin/" class="btn btn-primary-gradient btn-block">Go to Admin Login</a>
+            <a href="/" class="btn btn-ghost-light btn-block">Back to Home</a>
         </div>
     </div>
 </div>
