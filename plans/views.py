@@ -12,7 +12,7 @@ from datetime import timedelta
 from django.db.models import Count, Sum, Q
 from django.db import transaction
 from decimal import Decimal
-from wallet_app.models import Wallet, Purchase, Transaction
+from wallet_app.models import Wallet, Purchase, Transaction, Deposit
 from .models import TradeObject, InvestmentPlan, Investment
 from .serializers import InvestmentPlanSerializer, TradeObjectSerializer
 
