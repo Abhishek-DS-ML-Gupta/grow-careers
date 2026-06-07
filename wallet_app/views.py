@@ -105,6 +105,7 @@ def deposit_page(request):
                     user=request.user,
                     amount=Decimal(amount),
                     upi_id=upi_id,
+                    account_name=form.cleaned_data.get('account_name', '').strip(),
                     status='pending',
                 )
                 qr_data = generate_upi_qr(merchant_upi, amount)

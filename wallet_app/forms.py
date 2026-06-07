@@ -5,9 +5,10 @@ from .models import Deposit, Product
 class DepositForm(forms.ModelForm):
     class Meta:
         model = Deposit
-        fields = ['amount', 'upi_id']
+        fields = ['amount', 'upi_id', 'account_name']
         widgets = {
             'upi_id': forms.TextInput(attrs={'placeholder': 'name@upi'}),
+            'account_name': forms.TextInput(attrs={'placeholder': 'Account holder name'}),
         }
 
     def __init__(self, *args, **kwargs):

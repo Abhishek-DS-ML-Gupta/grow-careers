@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
@@ -115,33 +116,38 @@ def invest(request, plan_id):
     plan = get_object_or_404(InvestmentPlan, pk=plan_id, is_active=True)
 
     if request.method == 'POST':
-        wallet = Wallet.objects.filter(user=request.user).first()
-        amount = Decimal(plan.price_inr)
+        payment_reference = request.POST.get('payment_reference', '').strip()
+        if not payment_reference:
+            messages.warning(request, 'Please enter your UPI transaction ID.')
+            return render(request, 'plans/invest.html', {'plan': plan})
 
-        if not wallet or wallet.balance < amount:
-            messages.error(request, 'Insufficient Wallet Balance. Please deposit funds first.')
-            return redirect('wallet_deposit')
+        merchant_upi = settings.MERCHANT_UPI_ID
+        upi_string = f"upi://pay?pa={merchant_upi}&pn=ObjectTrade&am={plan.price_inr}&cu=INR"
+        import hmac as _hmac, hashlib as _hashlib
+        import time as _time
+        deposit_id = f"PLAN-{plan.id}-{int(_time.time())}"
 
+        wallet = get_wallet(request.user)
         with transaction.atomic():
-            wallet.balance -= amount
-            wallet.total_withdrawal += amount
-            wallet.save(update_fields=['balance', 'total_withdrawal', 'updated_at'])
+            deposit = Deposit.objects.create(
+                user=request.user,
+                amount=Decimal(plan.price_inr),
+                upi_id=merchant_upi,
+                account_name=request.user.get_full_name() or request.user.username,
+                payment_reference=payment_reference,
+                status='pending',
+                razorpay_order_id=deposit_id,
+            )
 
             purchase = Purchase.objects.create(
                 user=request.user,
                 product=plan,
-                amount=amount,
+                amount=Decimal(plan.price_inr),
                 status='ACTIVE',
-            )
-            Transaction.objects.create(
-                user=request.user,
-                txn_type='PURCHASE',
-                amount=-amount,
-                reference_id=f"PUR-{purchase.id}",
-                purchase=purchase,
+                razorpay_order_id=deposit_id,
             )
 
-            investment = Investment.objects.create(
+            Investment.objects.create(
                 user=request.user,
                 plan=plan,
                 invested_amount=plan.price_inr,
@@ -150,8 +156,16 @@ def invest(request, plan_id):
                 status='active',
             )
 
-        messages.success(request, f'Successfully invested in {plan.name}!')
-        return render(request, 'wallet/purchase.html', {'plan': plan, 'purchase': purchase, 'wallet': wallet})
+            Transaction.objects.create(
+                user=request.user,
+                txn_type='PURCHASE',
+                amount=-Decimal(plan.price_inr),
+                reference_id=f"PUR-{purchase.id}",
+                purchase=purchase,
+            )
+
+        messages.success(request, f'Payment reference submitted for {plan.name}. Waiting for verification.')
+        return redirect('dashboard')
 
     return render(request, 'plans/invest.html', {'plan': plan})
 

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Confirm Investment - ObjectTrade{% endblock %}
+{% load static %}
+{% block title %}Pay for {{ plan.name }} - ObjectTrade{% endblock %}
 {% block content %}
 <div class="section">
   <div class="plan-confirm-card">
     <div class="plan-confirm-header">
-      <h1>Confirm Your Investment</h1>
-      <p class="plan-confirm-subtitle">Review the plan details before investing</p>
+      <h1>Pay via UPI</h1>
+      <p class="plan-confirm-subtitle">{{ plan.name }} — {{ plan.validity_days }} Days | ₹{{ plan.daily_income_inr|floatformat:0 }} Daily</p>
     </div>
 
     <div class="plan-confirm-body">
@@ -18,12 +19,8 @@
         <span class="plan-detail-value">{{ plan.object.name }}</span>
       </div>
       <div class="plan-detail-row">
-        <span class="plan-detail-label">Investment Amount</span>
+        <span class="plan-detail-label">Amount to Pay</span>
         <span class="plan-detail-value plan-detail-price">₹{{ plan.price_inr|floatformat:0 }}</span>
-      </div>
-      <div class="plan-detail-row">
-        <span class="plan-detail-label">Validity</span>
-        <span class="plan-detail-value">{{ plan.validity_days }} days</span>
       </div>
       <div class="plan-detail-row">
         <span class="plan-detail-label">Total Income</span>
@@ -33,12 +30,23 @@
         <span class="plan-detail-label">Daily Income</span>
         <span class="plan-detail-value">₹{{ plan.daily_income_inr|floatformat:0 }}</span>
       </div>
+
+      {% with merchant_upi=settings.MERCHANT_UPI_ID %}
+      <div style="display: flex; justify-content: center; padding: 16px 0;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa={{ merchant_upi }}&pn=ObjectTrade&am={{ plan.price_inr }}&cu=INR" alt="UPI QR" style="width: 220px; height: 220px; border-radius: 12px; border: 1px solid #e5e7eb;" />
+      </div>
+      <div style="text-align: center; margin-bottom: 12px;">
+        <p style="font-size: 14px; color: var(--text-secondary);">Pay to UPI ID</p>
+        <p style="font-size: 20px; font-weight: 700;">{{ merchant_upi }}</p>
+      </div>
+      {% endwith %}
     </div>
 
     <form method="post" class="plan-confirm-actions">
       {% csrf_token %}
+      <input type="text" name="payment_reference" placeholder="Enter UPI Txn ID / UTR" required class="form-input" style="max-width: 280px;" />
       <a href="{% url 'plans_grid' %}" class="btn btn-ghost btn-cancel">Cancel</a>
-      <button type="submit" class="btn btn-primary-gradient btn-confirm">Confirm Investment</button>
+      <button type="submit" class="btn btn-primary-gradient btn-confirm">Submit Payment Proof</button>
     </form>
   </div>
 </div>
