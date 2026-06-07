@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
 from django.db.models import Count, Sum, Q
 from django.db import transaction
 from io import BytesIO
