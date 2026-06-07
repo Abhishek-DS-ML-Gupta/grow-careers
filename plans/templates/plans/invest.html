@@ -33,18 +33,23 @@
 
       {% with merchant_upi=settings.MERCHANT_UPI_ID %}
       <div style="display: flex; justify-content: center; padding: 16px 0;">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa={{ merchant_upi }}&pn=ObjectTrade&am={{ plan.price_inr }}&cu=INR" alt="UPI QR" style="width: 220px; height: 220px; border-radius: 12px; border: 1px solid #e5e7eb;" />
+        <a href="upi://pay?pa={{ merchant_upi }}&pn=ObjectTrade&am={{ plan.price_inr }}&cu=INR" style="display: inline-block; text-decoration: none;" title="Open UPI app to pay">
+          <img src="data:image/png;base64,{{ qr_b64 }}" alt="UPI QR" style="width: 260px; height: 260px; border-radius: 16px; border: 1px solid #e5e7eb; display: block;" />
+        </a>
       </div>
       <div style="text-align: center; margin-bottom: 12px;">
         <p style="font-size: 14px; color: var(--text-secondary);">Pay to UPI ID</p>
         <p style="font-size: 20px; font-weight: 700;">{{ merchant_upi }}</p>
+        <p style="font-size: 12px; color: var(--text-secondary);">Scan the QR above and complete the payment, then enter your UPI transaction ID below.</p>
       </div>
       {% endwith %}
+
     </div>
 
     <form method="post" class="plan-confirm-actions">
       {% csrf_token %}
-      <input type="text" name="payment_reference" placeholder="Enter UPI Txn ID / UTR" required class="form-input" style="max-width: 280px;" />
+      <input type="text" name="account_name" placeholder="Your Name (as in UPI)" class="form-input" style="max-width: 260px; margin-bottom: 8px;" />
+      <input type="text" name="payment_reference" placeholder="Enter UPI Txn ID / UTR" required class="form-input" style="max-width: 260px;" />
       <a href="{% url 'plans_grid' %}" class="btn btn-ghost btn-cancel">Cancel</a>
       <button type="submit" class="btn btn-primary-gradient btn-confirm">Submit Payment Proof</button>
     </form>

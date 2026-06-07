@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 
 
@@ -80,13 +82,16 @@ class Purchase(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='purchases')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='purchases')
+    investment_plan = models.ForeignKey('plans.InvestmentPlan', on_delete=models.SET_NULL, null=True, blank=True, related_name='purchases')
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     purchase_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ACTIVE')
 
     def __str__(self):
-        return f"{self.user.username} - {self.product.name} - ₹{self.amount}"
+        item = self.product or self.investment_plan
+        name = getattr(item, 'name', str(item)) if item else 'Unknown'
+        return f"{self.user.username} - {name} - ₹{self.amount}"
 
     class Meta:
         ordering = ['-purchase_date']

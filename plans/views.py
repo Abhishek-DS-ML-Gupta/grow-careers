@@ -11,8 +11,10 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Count, Sum, Q
 from django.db import transaction
-from decimal import Decimal
-from wallet_app.models import Wallet, Purchase, Transaction, Deposit
+from io import BytesIO
+import base64
+import qrcode as qr_lib
+from wallet_app.models import Wallet, Purchase, Transaction, Deposit, Product
 from .models import TradeObject, InvestmentPlan, Investment
 from .serializers import InvestmentPlanSerializer, TradeObjectSerializer
 
@@ -30,6 +32,14 @@ class TradeObjectViewSet(viewsets.ModelViewSet):
 def get_wallet(user):
     wallet, _ = Wallet.objects.get_or_create(user=user)
     return wallet
+
+
+def make_upi_qr_base64(upi_id, amount, name='ObjectTrade'):
+    upi_string = f"upi://pay?pa={upi_id}&pn={name}&am={amount}&cu=INR"
+    qr_img = qr_lib.make(upi_string)
+    buffered = BytesIO()
+    qr_img.save(buffered, format='PNG')
+    return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
 
 def plans_grid(request):
@@ -117,43 +127,60 @@ def invest(request, plan_id):
 
     if request.method == 'POST':
         payment_reference = request.POST.get('payment_reference', '').strip()
+        account_name = request.POST.get('account_name', '').strip()
         if not payment_reference:
             messages.warning(request, 'Please enter your UPI transaction ID.')
-            return render(request, 'plans/invest.html', {'plan': plan})
+    return render(request, 'plans/invest.html', {'plan': plan})
+
+
+@login_required
+def invest(request, plan_id):
+    plan = get_object_or_404(InvestmentPlan, pk=plan_id, is_active=True)
+
+    if request.method == 'POST':
+        payment_reference = request.POST.get('payment_reference', '').strip()
+        account_name = request.POST.get('account_name', '').strip()
+        if not payment_reference:
+            messages.warning(request, 'Please enter your UPI transaction ID.')
+            return redirect('invest', plan_id=plan.id)
 
         merchant_upi = settings.MERCHANT_UPI_ID
-        upi_string = f"upi://pay?pa={merchant_upi}&pn=ObjectTrade&am={plan.price_inr}&cu=INR"
-        import hmac as _hmac, hashlib as _hashlib
-        import time as _time
-        deposit_id = f"PLAN-{plan.id}-{int(_time.time())}"
 
-        wallet = get_wallet(request.user)
         with transaction.atomic():
-            deposit = Deposit.objects.create(
-                user=request.user,
-                amount=Decimal(plan.price_inr),
-                upi_id=merchant_upi,
-                account_name=request.user.get_full_name() or request.user.username,
-                payment_reference=payment_reference,
-                status='pending',
-                razorpay_order_id=deposit_id,
+            product, _ = Product.objects.get_or_create(
+                name=plan.name,
+                defaults={
+                    'description': plan.object.description,
+                    'investment_amount': plan.price_inr,
+                    'daily_return': plan.daily_income_inr,
+                    'duration_days': plan.validity_days,
+                    'total_income': plan.total_income_inr,
+                },
             )
 
-            purchase = Purchase.objects.create(
-                user=request.user,
-                product=plan,
-                amount=Decimal(plan.price_inr),
-                status='ACTIVE',
-                razorpay_order_id=deposit_id,
-            )
-
-            Investment.objects.create(
+            investment = Investment.objects.create(
                 user=request.user,
                 plan=plan,
                 invested_amount=plan.price_inr,
                 start_date=timezone.now().date(),
                 end_date=timezone.now().date() + timedelta(days=plan.validity_days),
                 status='active',
+            )
+
+            deposit = Deposit.objects.create(
+                user=request.user,
+                amount=Decimal(plan.price_inr),
+                upi_id=merchant_upi,
+                account_name=account_name or request.user.get_full_name() or request.user.username,
+                payment_reference=payment_reference,
+                status='pending',
+            )
+
+            purchase = Purchase.objects.create(
+                user=request.user,
+                product=product,
+                amount=Decimal(plan.price_inr),
+                status='ACTIVE',
             )
 
             Transaction.objects.create(
@@ -167,7 +194,9 @@ def invest(request, plan_id):
         messages.success(request, f'Payment reference submitted for {plan.name}. Waiting for verification.')
         return redirect('dashboard')
 
-    return render(request, 'plans/invest.html', {'plan': plan})
+    qr_b64 = make_upi_qr_base64(settings.MERCHANT_UPI_ID, plan.price_inr)
+    return render(request, 'plans/invest.html', {'plan': plan, 'qr_b64': qr_b64})
+
 
 
 def is_admin(user):
