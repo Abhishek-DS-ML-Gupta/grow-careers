@@ -1,4 +1,6 @@
 ﻿from rest_framework import viewsets
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login as auth_login
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import AuthenticationForm

@@ -202,6 +202,39 @@ def run_daily_payouts(request):
     return render(request, 'wallet/admin/payouts.html', context)
 
 
+def execute_daily_payouts():
+    today = timezone.now().date()
+    active_investments = Investment.objects.filter(
+        status='active',
+        start_date__lte=today,
+        end_date__gte=today,
+    ).exclude(last_payout_date=today)
+
+    updated_count = 0
+    for inv in active_investments:
+        wallet, _ = Wallet.objects.get_or_create(user=inv.user)
+        wallet.balance = F('balance') + Decimal(inv.plan.daily_income_inr)
+        wallet.total_earned = F('total_earned') + Decimal(inv.plan.daily_income_inr)
+        wallet.save(update_fields=['balance', 'total_earned', 'updated_at'])
+
+        inv.total_earned = F('total_earned') + inv.plan.daily_income_inr
+        inv.last_payout_date = today
+        if inv.total_earned >= inv.plan.total_income_inr:
+            inv.status = 'completed'
+            inv.end_date = today
+        inv.save(update_fields=['total_earned', 'last_payout_date', 'status', 'end_date'])
+
+        Transaction.objects.create(
+            user=inv.user,
+            txn_type='PURCHASE',
+            amount=Decimal(inv.plan.daily_income_inr),
+            reference_id=f"PAYOUT-{inv.id}-{today}",
+        )
+        updated_count += 1
+
+    return updated_count
+
+
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
