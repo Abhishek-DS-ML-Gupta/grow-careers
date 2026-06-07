@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Daily Payouts - ObjectTrade{% endblock %}
+{% block content %}
+<div class="section">
+  <div class="section-header-left">
+    <div>
+      <h1 class="section-title">Daily Payout Run</h1>
+      <p class="section-subtitle">Execute daily income payouts to all active investments.</p>
+    </div>
+  </div>
+
+  <div class="max-w-xl mx-auto">
+    <div class="plan-confirm-card">
+      <div class="plan-confirm-body" style="padding-top: 24px; text-align: center;">
+        <div class="dash-stat-icon income" style="font-size: 56px;">💰</div>
+        <h2 style="font-size: 20px; font-weight: 700; margin-top: 12px;">Daily Payout Result</h2>
+        <p style="margin-top: 8px; font-size: 16px;">Payouts processed for <strong style="font-size: 24px;">{{ count }}</strong> investment(s) today.</p>
+      </div>
+      <div class="plan-confirm-actions" style="justify-content: center; background: transparent; border-top: none; padding-top: 0;">
+        <a href="{% url 'wallet_admin_investments' %}" class="btn btn-secondary">Back to Investments</a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Deposits - ObjectTrade{% endblock %}
+{% block content %}
+<div>
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
+    <div>
+      <h1 style="font-size: 32px; font-weight: 800; color: var(--text-primary);">Deposit Verification</h1>
+      <p style="color: var(--text-secondary); margin-top: 4px;">Approve or reject user deposits. Wallet is credited only after admin approval.</p>
+    </div>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <h3 class="table-title">All Deposits</h3>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Amount</th>
+          <th>UPI ID</th>
+          <th>Reference</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Verified by</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dep in deposits %}
+        <tr>
+          <td style="font-weight: 600;">{{ dep.user.username }}</td>
+          <td style="font-weight: 600;">₹{{ dep.amount|floatformat:2 }}</td>
+          <td>{{ dep.upi_id|default:'-' }}</td>
+          <td>{{ dep.payment_reference|default:'-' }}</td>
+          <td>
+            {% if dep.status == 'pending' %}
+              <span class="badge badge-warning">Pending</span>
+            {% elif dep.status == 'completed' %}
+              <span class="badge badge-success">Completed</span>
+            {% elif dep.status == 'cancelled' %}
+              <span class="badge badge-danger">Cancelled</span>
+            {% else %}
+              <span class="badge badge-info">{{ dep.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ dep.created_at|date:'M d, Y H:i' }}</td>
+          <td>{{ dep.verified_by.username|default:'-' }}</td>
+          <td>
+            {% if dep.status == 'pending' %}
+              <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="deposit_id" value="{{ dep.id }}" />
+                <input type="hidden" name="action" value="approve" />
+                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+              </form>
+              <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="deposit_id" value="{{ dep.id }}" />
+                <input type="hidden" name="action" value="reject" />
+                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+              </form>
+              <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="deposit_id" value="{{ dep.id }}" />
+                <input type="hidden" name="action" value="reject" />
+                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+              </form>
+            {% else %}
+              <span style="font-size: 13px; color: var(--text-secondary);">No action</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

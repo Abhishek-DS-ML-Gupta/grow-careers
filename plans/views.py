@@ -1,10 +1,6 @@
 ﻿from rest_framework import viewsets
-from django.shortcuts import render
+from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.views import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -26,6 +22,11 @@ class InvestmentPlanViewSet(viewsets.ModelViewSet):
 class TradeObjectViewSet(viewsets.ModelViewSet):
     queryset = TradeObject.objects.filter(is_active=True)
     serializer_class = TradeObjectSerializer
+
+
+def get_wallet(user):
+    wallet, _ = Wallet.objects.get_or_create(user=user)
+    return wallet
 
 
 def plans_grid(request):
@@ -56,8 +57,7 @@ class AdminOnlyUserLoginForm(AuthenticationForm):
         if user.is_staff:
             raise ValidationError("Admin users must log in via /admin.")
 
-from django.core.exceptions import ValidationError
-from django.contrib.auth import authenticate, login
+
 
 def signup(request):
     if request.method == 'POST':
@@ -95,17 +95,17 @@ def user_login(request):
         form = AdminOnlyUserLoginForm(request, data=request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('home')
+            return redirect('dashboard')
     else:
         form = AdminOnlyUserLoginForm(request)
     return render(request, 'plans/login.html', {'form': form})
 
 
 @login_required
-@user_passes_test(is_admin)
 def dashboard(request):
     investments = Investment.objects.filter(user=request.user).select_related('plan__object')
-    return render(request, 'plans/dashboard.html', {'investments': investments})
+    wallet = get_wallet(request.user)
+    return render(request, 'plans/dashboard.html', {'investments': investments, 'wallet': wallet})
 
 
 @login_required

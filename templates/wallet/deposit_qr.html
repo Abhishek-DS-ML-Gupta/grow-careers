@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Scan QR to Pay - ObjectTrade{% endblock %}
+{% block content %}
+<div class="section">
+  <div class="section-header-left">
+    <div>
+      <h1 class="section-title">Pay via UPI</h1>
+      <p class="section-subtitle">Scan QR or manually pay to UPI ID below</p>
+    </div>
+  </div>
+
+  <div class="max-w-xl mx-auto">
+    <div class="plan-confirm-card">
+      <div style="text-align: center; padding-top: 22px;">
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Amount to Pay</p>
+        <div style="font-size: 36px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">₹{{ amount|floatformat:2 }}</div>
+        <p style="font-size: 13px; color: var(--text-secondary);">Reference: {{ deposit.id }}</p>
+      </div>
+
+      <div class="plan-confirm-body" style="display: flex; justify-content: center; padding: 24px 0;">
+        <div style="background: white; padding: 16px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+          <img src="data:image/png;base64,{{ qr_data }}" alt="UPI QR" style="width: 240px; height: 240px; display: block;" />
+        </div>
+      </div>
+
+      <div class="plan-confirm-body" style="border-top: 1px solid #f0f0f0; padding-top: 22px;">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <p style="font-size: 14px; color: var(--text-secondary);">Pay to UPI ID</p>
+          <p style="font-size: 20px; font-weight: 700; color: var(--text-primary);">{{ merchant_upi }}</p>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary); text-align: center;">Use any UPI app (GPay, PhonePe, Paytm, BHIM) to scan the QR or send to the UPI ID above.</p>
+      </div>
+
+      <div class="plan-confirm-actions" style="justify-content: center; background: transparent; border-top: none; padding-top: 0;">
+        <p style="font-size: 13px; color: var(--text-secondary);">Need help? <a href="https://wa.me/918850171059" target="_blank" style="color: var(--success); font-weight: 600; text-decoration: none;">WhatsApp +91 8850171059</a></p>
+        <p style="font-size: 13px; color: var(--text-secondary);">After payment, please submit confirmation in your wallet.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

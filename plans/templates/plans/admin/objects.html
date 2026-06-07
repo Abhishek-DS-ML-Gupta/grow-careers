@@ -19,7 +19,6 @@
                     <th>Market Value</th>
                     <th>Plans</th>
                     <th>Status</th>
-                    <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -37,7 +36,7 @@
                         <span class="badge badge-danger">Inactive</span>
                         {% endif %}
                     </td>
-                    <td style="color: var(--text-secondary);">{{ obj.created_at|date:"M d, Y" }}</td>
+                    
                     <td>
                         <div style="display: flex; gap: 8px;">
                             <a href="{% url 'admin_edit_object' obj.id %}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Edit</a>
@@ -49,7 +48,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="7" style="text-align: center; padding: 32px; color: var(--text-secondary);">No objects found.</td></tr>
+                <tr><td colspan="6" style="text-align: center; padding: 32px; color: var(--text-secondary);">No objects found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

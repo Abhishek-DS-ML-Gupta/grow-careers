@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Admin Investments - ObjectTrade{% endblock %}
+{% block content %}
+<div>
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
+    <div>
+      <h1 style="font-size: 32px; font-weight: 800; color: var(--text-primary);">Investment Management</h1>
+      <p style="color: var(--text-secondary); margin-top: 4px;">Approve or reject investments initiated by users. Daily payouts are credited to wallet upon approval.</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <a href="{% url 'run_daily_payouts' %}" class="btn btn-primary">Run Daily Payouts Now</a>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <h3 class="table-title">All Investments</h3>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Plan</th>
+          <th>Object</th>
+          <th>Invested</th>
+          <th>Daily Income</th>
+          <th>Total Earned</th>
+          <th>Status</th>
+          <th>Last Payout</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inv in investments %}
+        <tr>
+          <td style="font-weight: 600;">{{ inv.user.username }}</td>
+          <td>{{ inv.plan.name }}</td>
+          <td>{{ inv.plan.object.name }}</td>
+          <td style="font-weight: 600;">₹{{ inv.invested_amount|floatformat:0 }}</td>
+          <td style="color: var(--success);">₹{{ inv.plan.daily_income_inr|floatformat:0 }}</td>
+          <td style="color: var(--success); font-weight: 600;">₹{{ inv.total_earned|floatformat:0 }}</td>
+          <td>
+            {% if inv.status == 'pending' %}
+              <span class="badge badge-warning">Pending Approval</span>
+            {% elif inv.status == 'active' %}
+              <span class="badge badge-success">Active</span>
+            {% elif inv.status == 'completed' %}
+              <span class="badge badge-info">Completed</span>
+            {% else %}
+              <span class="badge badge-danger">Cancelled</span>
+            {% endif %}
+          </td>
+          <td>{{ inv.last_payout_date|default:'-' }}</td>
+          <td>
+            {% if inv.status == 'pending' %}
+              <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="investment_id" value="{{ inv.id }}" />
+                <input type="hidden" name="action" value="approve" />
+                <input type="text" name="upi_reference" placeholder="UPI Ref (optional)" style="width: 140px; font-size: 12px; padding: 6px; border-radius: 4px; border: 1px solid var(--border);" />
+                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+              </form>
+              <form method="post" style="display: inline; margin-left: 4px;">
+                {% csrf_token %}
+                <input type="hidden" name="investment_id" value="{{ inv.id }}" />
+                <input type="hidden" name="action" value="cancel" />
+                <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+              </form>
+            {% elif inv.status == 'active' %}
+              <form method="post" action="{% url 'admin_manual_payout' inv.id %}" style="display: inline;">
+                {% csrf_token %}
+                <input type="number" name="amount" value="{{ inv.plan.daily_income_inr }}" step="0.01" style="width: 90px; font-size: 12px; padding: 6px; border-radius: 4px; border: 1px solid var(--border);" />
+                <button type="submit" class="btn btn-sm btn-primary">Payout</button>
+              </form>
+            {% else %}
+              <span style="font-size: 13px; color: var(--text-secondary);">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
