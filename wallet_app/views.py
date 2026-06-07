@@ -64,6 +64,36 @@ def deposit_page(request):
     merchant_upi = settings.MERCHANT_UPI_ID
 
     if request.method == 'POST':
+        if request.POST.get('confirm_payment') == '1':
+            deposit_id = request.POST.get('deposit_id')
+            payment_reference = request.POST.get('payment_reference', '').strip()
+            deposit = get_object_or_404(Deposit, pk=deposit_id, user=request.user)
+            if deposit.status != 'pending':
+                messages.warning(request, 'This deposit has already been processed.')
+            else:
+                deposit.payment_reference = payment_reference
+                with transaction.atomic():
+                    deposit.status = 'completed'
+                    deposit.is_verified = True
+                    deposit.verified_by = request.user
+                    deposit.verified_at = timezone.now()
+                    deposit.save(update_fields=['payment_reference', 'status', 'is_verified', 'verified_by', 'verified_at', 'updated_at'])
+
+                    wallet, _ = Wallet.objects.get_or_create(user=request.user)
+                    wallet.balance += deposit.amount
+                    wallet.total_deposit += deposit.amount
+                    wallet.save(update_fields=['balance', 'total_deposit', 'updated_at'])
+
+                    Transaction.objects.create(
+                        user=request.user,
+                        txn_type='DEPOSIT',
+                        amount=deposit.amount,
+                        reference_id=f"DEP-{deposit.id}",
+                        deposit=deposit,
+                    )
+                messages.success(request, 'Payment verified and ₹%s added to your wallet.' % deposit.amount)
+            return redirect('wallet_deposit')
+
         form = DepositForm(request.POST)
         if form.is_valid():
             amount = form.cleaned_data['amount']

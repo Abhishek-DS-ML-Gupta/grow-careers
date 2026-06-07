@@ -34,7 +34,14 @@
 
       <div class="plan-confirm-actions" style="justify-content: center; background: transparent; border-top: none; padding-top: 0;">
         <p style="font-size: 13px; color: var(--text-secondary);">Need help? <a href="https://wa.me/918850171059" target="_blank" style="color: var(--success); font-weight: 600; text-decoration: none;">WhatsApp +91 8850171059</a></p>
-        <p style="font-size: 13px; color: var(--text-secondary);">After payment, please submit confirmation in your wallet.</p>
+        <p style="font-size: 13px; color: var(--text-secondary);">After payment, submit your UPI transaction ID below for verification.</p>
+
+        <form method="post" action="{% url 'wallet_deposit' %}" style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+          {% csrf_token %}
+          <input type="hidden" name="deposit_id" value="{{ deposit.id }}" />
+          <input type="text" name="payment_reference" placeholder="Enter UPI Txn ID / UTR" required class="form-input" style="max-width: 260px;" />
+          <button type="submit" class="btn btn-primary" name="confirm_payment" value="1">Submit for Verification</button>
+        </form>
       </div>
     </div>
   </div>
